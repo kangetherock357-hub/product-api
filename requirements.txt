@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+sqlmodel
+psycopg2-binary
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+slowapi
+python-dotenv
+psutil
+pytest
+pytest-cov
+pytest-asyncio
+pytest-benchmark
+httpx
+ruff
+black

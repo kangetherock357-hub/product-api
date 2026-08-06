@@ -1,52 +1,48 @@
-from datetime import datetime, timezone
 import re
-from typing import List, Optional
+from datetime import UTC, datetime
 
 from pydantic import field_validator
 from sqlmodel import Field, Relationship, SQLModel
-
 
 # ==========================================
 # Database Models (table=True)
 # ==========================================
 
+
 class Category(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True, index=True, min_length=2, max_length=50)
-    description: Optional[str] = Field(default=None, max_length=200)
+    description: str | None = Field(default=None, max_length=200)
 
     # Relationships
-    products: List["Product"] = Relationship(back_populates="category")
+    products: list[Product] = Relationship(back_populates="category")
 
 
 class Product(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True, min_length=2, max_length=100)
     description: str = Field(min_length=10, max_length=500)
     price: float = Field(gt=0)
     stock: int = Field(ge=0, default=0)
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
-    updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
     # Foreign Keys & Relationships
-    category_id: Optional[int] = Field(default=None, foreign_key="category.id")
-    category: Optional[Category] = Relationship(back_populates="products")
+    category_id: int | None = Field(default=None, foreign_key="category.id")
+    category: Category | None = Relationship(back_populates="products")
 
 
 # ==========================================
 # Request / Response Schemas (DTOs)
 # ==========================================
 
+
 class ProductCreate(SQLModel):
     name: str = Field(min_length=2, max_length=100)
     description: str = Field(min_length=10, max_length=500)
     price: float = Field(gt=0, le=1000000)
     stock: int = Field(ge=0, le=10000)
-    category_id: Optional[int] = None
+    category_id: int | None = None
 
     @field_validator("name")
     def validate_name(cls, v: str) -> str:
@@ -67,12 +63,12 @@ class ProductCreate(SQLModel):
 
 
 class ProductUpdate(SQLModel):
-    name: Optional[str] = Field(None, min_length=2, max_length=100)
-    description: Optional[str] = Field(None, min_length=10, max_length=500)
-    price: Optional[float] = Field(None, gt=0)
-    stock: Optional[int] = Field(None, ge=0)
+    name: str | None = Field(None, min_length=2, max_length=100)
+    description: str | None = Field(None, min_length=10, max_length=500)
+    price: float | None = Field(None, gt=0)
+    stock: int | None = Field(None, ge=0)
 
 
 class CategoryCreate(SQLModel):
     name: str = Field(min_length=2, max_length=50)
-    description: Optional[str] = Field(None, max_length=200)
+    description: str | None = Field(None, max_length=200)
