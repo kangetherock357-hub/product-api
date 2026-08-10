@@ -1,17 +1,66 @@
-from fastapi import FastAPI
+from typing import Annotated
+from datetime import datetime, timezone
+from sqlmodel import Session, select
+from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi.responses import HTMLResponse
 
-# Create the FastAPI instance FIRST
-app = FastAPI()
+# 1. Initialize the FastAPI application instance
+app = FastAPI(title="Product API")
 
-# Routes go below this line
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
+# Placeholder dependencies (ensure your actual import paths match your project setup)
+# from database import get_session
+# from auth import get_current_user, User
+# from models import Product, ProductCreate, ProductUpdate, Category
 
 
+# --- PORTFOLIO HOMEPAGE ENDPOINT ---
+@app.get("/", response_class=HTMLResponse)
+async def portfolio():
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Student Portfolio - Backend Assignments</title>
+        <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+            .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+            .student-info { background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 20px 0; }
+            .admission { font-size: 1.2em; color: #2980b9; font-weight: bold; }
+            .assignment { margin: 12px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db; }
+            .assignment a { color: #0366d6; text-decoration: none; font-weight: 500; }
+            .badge { display: inline-block; background: #3498db; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; margin-right: 10px; }
+            .footer { margin-top: 30px; text-align: center; color: #95a5a6; font-size: 0.9em; border-top: 1px solid #ecf0f1; padding-top: 20px; }
+        </style>
+    </head>
+    <body>
+    <div class="container">
+        <h1>Backend Development Portfolio</h1>
+        <div class="student-info">
+            <p><strong>Student Name:</strong> [YOUR FULL NAME]</p>
+            <p><strong>Admission Number:</strong> <span class="admission">C027-01-XXXX/2024</span></p>
+            <p><strong>Email:</strong> [YOUR STUDENT EMAIL] 📧</p>
+        </div>
+        <h2>Backend Assignments 📝</h2>
+        <div class="assignment"><a href="[LESSON 1 GITHUB URL]" target="_blank"><span class="badge">Lesson 1</span> HTTP & Your First API</a></div>
+        <div class="assignment"><a href="[LESSON 2 GITHUB URL]" target="_blank"><span class="badge">Lesson 2</span> Docker - Packaging Your API</a></div>
+        <div class="assignment"><a href="[LESSON 3 GITHUB URL]" target="_blank"><span class="badge">Lesson 3</span> Routing, Parameters & Validation</a></div>
+        <div class="assignment"><a href="[LESSON 4 GITHUB URL]" target="_blank"><span class="badge">Lesson 4</span> PostgreSQL & SQLModel</a></div>
+        <div class="assignment"><a href="[LESSON 5 GITHUB URL]" target="_blank"><span class="badge">Lesson 5</span> CRUD Operations</a></div>
+        <div class="assignment"><a href="[LESSON 6 GITHUB URL]" target="_blank"><span class="badge">Lesson 6</span> Error Handling & Validation</a></div>
+        <div class="assignment"><a href="[LESSON 7 GITHUB URL]" target="_blank"><span class="badge">Lesson 7</span> JWT & Password Hashing</a></div>
+        <div class="assignment"><a href="[LESSON 8 GITHUB URL]" target="_blank"><span class="badge">Lesson 8</span> Authorization & Rate Limiting</a></div>
+        <div class="assignment"><a href="[LESSON 9 GITHUB URL]" target="_blank"><span class="badge">Lesson 9</span> File Uploads & External APIs</a></div>
+        <div class="assignment"><a href="[LESSON 10 GITHUB URL]" target="_blank"><span class="badge">Lesson 10</span> Testing & Deployment</a></div>
+        <div class="footer"><p>Deployed on Render | Last Updated: August 2026</p></div>
+    </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
 
-from datetime import datetime, timezone  # Ensure datetime and timezone are imported
 
+# --- PRODUCT ENDPOINTS ---
 
 @app.post("/products", response_model=Product, status_code=status.HTTP_201_CREATED)
 def create_product(
