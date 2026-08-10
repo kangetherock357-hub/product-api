@@ -1,3 +1,15 @@
+from fastapi import FastAPI
+
+# Create the FastAPI instance FIRST
+app = FastAPI()
+
+# Routes go below this line
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
+
+
+
 from datetime import datetime, timezone  # Ensure datetime and timezone are imported
 
 
