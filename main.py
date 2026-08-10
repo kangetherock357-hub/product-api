@@ -1,7 +1,21 @@
+from typing import Annotated, Optional
+from datetime import datetime, timezone
+from sqlmodel import SQLModel, Field, Session, select, create_engine
+from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from typing import Optional
-from sqlmodel import SQLModel, Field
+# 1. Database Configuration
+# Update database connection string as needed for local or production PostgreSQL
+DATABASE_URL = "sqlite:///./database.db" 
+engine = create_engine(DATABASE_URL, echo=True)
 
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
+# 2. SQLModel Database Schemas & Pydantic Models
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
@@ -20,6 +34,7 @@ class ProductBase(SQLModel):
 
 class Product(ProductBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    updated_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ProductCreate(ProductBase):
     pass
@@ -30,16 +45,33 @@ class ProductUpdate(SQLModel):
     price: Optional[float] = None
     stock: Optional[int] = None
     category_id: Optional[int] = None
-# 1. Initialize the FastAPI application instance
+
+
+# 3. Security & Dependency Setup
+security = HTTPBearer()
+
+def get_current_user(
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
+    session: Annotated[Session, Depends(get_session)]
+) -> User:
+    """Authentication dependency placeholder"""
+    # Replace with JWT token validation logic
+    user = session.exec(select(User)).first()
+    if not user:
+        # Fallback dummy user for testing/demo purposes
+        return User(id=1, username="student", email="student@example.com")
+    return user
+
+
+# 4. App Initialization & Database Table Creation
 app = FastAPI(title="Product API")
 
-# Placeholder dependencies (ensure your actual import paths match your project setup)
-# from database import get_session
-# from auth import get_current_user, User
-# from models import Product, ProductCreate, ProductUpdate, Category
+@app.on_event("startup")
+def on_startup():
+    SQLModel.metadata.create_all(engine)
 
 
-# --- PORTFOLIO HOMEPAGE ENDPOINT ---
+# 5. Portfolio Index Endpoint
 @app.get("/", response_class=HTMLResponse)
 async def portfolio():
     html_content = """
@@ -86,7 +118,7 @@ async def portfolio():
     return HTMLResponse(content=html_content)
 
 
-# --- PRODUCT ENDPOINTS ---
+# 6. Product API Endpoints
 
 @app.post("/products", response_model=Product, status_code=status.HTTP_201_CREATED)
 def create_product(
