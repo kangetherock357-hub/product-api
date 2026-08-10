@@ -1,11 +1,35 @@
-from models import Product, ProductCreate, ProductUpdate, Category, User
 
-from typing import Annotated
-from datetime import datetime, timezone
-from sqlmodel import Session, select
-from fastapi import FastAPI, HTTPException, status, Depends
-from fastapi.responses import HTMLResponse
+from typing import Optional
+from sqlmodel import SQLModel, Field
 
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    username: str
+    email: str
+
+class Category(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+
+class ProductBase(SQLModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    stock: int
+    category_id: Optional[int] = Field(default=None, foreign_key="category.id")
+
+class Product(ProductBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+class ProductCreate(ProductBase):
+    pass
+
+class ProductUpdate(SQLModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    stock: Optional[int] = None
+    category_id: Optional[int] = None
 # 1. Initialize the FastAPI application instance
 app = FastAPI(title="Product API")
 
