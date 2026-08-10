@@ -1,3 +1,5 @@
+from models import Product, ProductCreate, ProductUpdate, Category, User
+
 from typing import Annotated
 from datetime import datetime, timezone
 from sqlmodel import Session, select
