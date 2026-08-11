@@ -95,9 +95,9 @@ async def portfolio():
     <div class="container">
         <h1>Backend Development Portfolio</h1>
         <div class="student-info">
-            <p><strong>Student Name:</strong> [YOUR FULL NAME]</p>
-            <p><strong>Admission Number:</strong> <span class="admission">C027-01-XXXX/2024</span></p>
-            <p><strong>Email:</strong> [YOUR STUDENT EMAIL] 📧</p>
+            <p><strong>Student Name:</strong> [SAMUEL KANGETHE MWANGI]</p>
+            <p><strong>Admission Number:</strong> <span class="admission">C027-01-0840/2024</span></p>
+            <p><strong>Email:</strong> [samuel.mwangi24@students.dkut.ac.ke] 📧</p>
         </div>
         <h2>Backend Assignments 📝</h2>
         <div class="assignment"><a href="[LESSON 1 GITHUB URL]" target="_blank"><span class="badge">Lesson 1</span> HTTP & Your First API</a></div>
